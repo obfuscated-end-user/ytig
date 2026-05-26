@@ -1,8 +1,8 @@
 {
 	"manifest_version": 2,
-	"name": "YouTube Link Saver",
+	"name": "YouTube ID Grabber",
 	"version": "1.0",
-	"description": "Save visible YouTube links from a page.",
+	"description": "Grab YouTube IDs.",
 	"permissions": [
 		"menus",
 		"activeTab",

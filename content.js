@@ -106,13 +106,10 @@ browser.runtime.onMessage.addListener(async (message) => {
 			for (const attr of attrs) {
 				if (!attr) continue;
 
-				//google redirect support
+				// google redirect support
 				try {
 					const parsed = new URL(attr, location.href);
-
-					const redirected =
-						parsed.searchParams.get("url") ||
-						parsed.searchParams.get("q");
+					const redirected = parsed.searchParams.get("url") || parsed.searchParams.get("q");
 
 					if (redirected) addIfYouTube(decodeURIComponent(redirected));
 				} catch {}
@@ -129,11 +126,4 @@ browser.runtime.onMessage.addListener(async (message) => {
 
 		return { links: [...links] };
 	}
-
-	/* if (message.action === "copyText") {
-		await navigator.clipboard.writeText("");
-		await new Promise(resolve => setTimeout(resolve, 50));
-		await navigator.clipboard.writeText(message.text || "");
-		return { ok: true };
-	} */
 });

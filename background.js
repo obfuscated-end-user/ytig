@@ -1,22 +1,21 @@
 browser.runtime.onInstalled.addListener(() => {
 	browser.menus.create({
-		id: "copy-visible-youtube-links",
-		title: "Copy visible YouTube links",
+		id: "grab-youtube-ids",
+		title: "Grab YouTube IDs",
 		contexts: ["page", "selection"]
 	});
 });
 
 browser.menus.onClicked.addListener(async (info, tab) => {
-	if (info.menuItemId !== "copy-visible-youtube-links") return;
+	if (info.menuItemId !== "grab-youtube-ids") return;
 	try {
 		const result = await browser.tabs.sendMessage(tab.id, { action: "grabVisibleLinks" });
 		const links = [...new Set(result?.links || [])];
 		const text = links.join("\n");
-		console.log("========== COPIED LINKS ==========");
 		console.log(links);
 		for (const [index, link] of links.entries())
 			console.log(`${index + 1}. (${link.length}) ${link}`);
-		console.log(`Total links: ${links.length}`);
+		console.log(`Total IDs: ${links.length}`);
 		// if no links found, clipboard becomes empty
 		// await browser.tabs.sendMessage(tab.id, { action: "copyText", text });
 		await navigator.clipboard.writeText("");

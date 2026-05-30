@@ -3,6 +3,13 @@ browser.runtime.onMessage.addListener(async (message) => {
 	const links = new Set();
 	if (message.action === "grabVisibleLinks") {
 		links.clear();
+
+		function stripRadioPrefix(id) {
+			if (!id) return id;
+			if (id.startsWith("RD")) return id.slice(2);
+			return id;
+		}
+
 		function normalize(url) {
 			if (!url) return null;
 
@@ -28,7 +35,7 @@ browser.runtime.onMessage.addListener(async (message) => {
 				if (host === "youtu.be") {
 					const id = parsed.pathname.slice(1);
 					// if (id) return `https://youtu.be/${id}`;
-					if (id) return id;
+					if (id) return stripRadioPrefix(id);
 				}
 				if (host === "youtube.com") {
 					// WATCH LINKS
@@ -37,11 +44,11 @@ browser.runtime.onMessage.addListener(async (message) => {
 						const list = parsed.searchParams.get("list");
 
 						// video + playlist
-						// if (v && list) return `https://www.youtube.com/watch?v=${v}&list=${list}`;
-						if ((v && list) || list) return list;
 						// video only
 						// if (v) return `https://www.youtube.com/watch?v=${v}`;
 						if (v) return v;
+						// if (v && list) return `https://www.youtube.com/watch?v=${v}&list=${list}`;
+						if ((v && list) || list) return stripRadioPrefix(list);
 						// playlist only
 						// if (list) return `https://www.youtube.com/playlist?list=${list}`;
 					}
@@ -49,19 +56,19 @@ browser.runtime.onMessage.addListener(async (message) => {
 					if (parsed.pathname === "/playlist") {
 						const list = parsed.searchParams.get("list");
 						// if (list) return `https://www.youtube.com/playlist?list=${list}`;
-						if (list) return list;
+						if (list) return stripRadioPrefix(list);
 					}
 					// SHORTS
 					if (parsed.pathname.startsWith("/shorts/")) {
 						const id = parsed.pathname.split("/")[2];
 						// if (id) return `https://www.youtube.com/shorts/${id}`;
-						if (id) return id;
+						if (id) return stripRadioPrefix(id);
 					}
 					// EMBED
 					if (parsed.pathname.startsWith("/embed/")) {
 						const id = parsed.pathname.split("/")[2];
 						// if (id) return `https://youtube.com/embed/${id}`;
-						if (id) return id;
+						if (id) return stripRadioPrefix(id);
 					}
 				}
 			} catch {}
@@ -69,9 +76,15 @@ browser.runtime.onMessage.addListener(async (message) => {
 			return null;
 		}
 
+		function isAllowedId(id) {
+			if (!id) return false;
+			const blocked = new Set(["WL", "LL"]);
+			return !blocked.has(id);
+		}
+
 		function addIfYouTube(url) {
 			const normalized = normalize(url);
-			if (normalized) links.add(normalized);
+			if (normalized && isAllowedId(normalized)) links.add(normalized);
 		}
 
 		// get links from attributes, tags, embeds

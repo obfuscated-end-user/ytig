@@ -17,9 +17,7 @@ browser.menus.onClicked.addListener(async (info, tab) => {
 			console.log(`${index + 1}. (${link.length}) ${link}`);
 		console.log(`Total IDs: ${links.length}`);
 		// if no links found, clipboard becomes empty
-		// await browser.tabs.sendMessage(tab.id, { action: "copyText", text });
-		await navigator.clipboard.writeText("");
-		await navigator.clipboard.writeText(text || "");
+		await navigator.clipboard.writeText(text + "\n" || "");
 	} catch (err) {
 		console.error(err);
 	}

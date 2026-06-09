@@ -1,5 +1,4 @@
-// still breaks with any link that has a radio playlist at the end
-browser.runtime.onMessage.addListener(async (message) => {
+browser.runtime.onMessage.addListener(async message => {
 	const links = new Set();
 	if (message.action === "grabVisibleLinks") {
 		links.clear();

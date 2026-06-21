@@ -2,25 +2,20 @@
 youtube id grabber, TBD
 
 # Installation
-1. Create a folder:
-```
-youtube-link-saver
-```
-2. Put the 3 files inside it.
-3. Open Firefox.
-4. Go to:
+1. Open Firefox.
+2. Go to:
 ```
 about:debugging
 ```
-5. Click:
+3. Click:
 ```
 This Firefox
 ```
-6. Click:
+4. Click:
 ```
 Load Temporary Add-on
 ```
-7. Select:
+5. Select:
 ```
 manifest.json
 ```

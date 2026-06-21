@@ -1,7 +1,6 @@
 browser.runtime.onMessage.addListener(async message => {
-	const links = new Set();
 	if (message.action === "grabVisibleLinks") {
-		links.clear();
+		const links = new Set();
 
 		function stripRadioPrefix(id) {
 			if (!id) return id;
@@ -12,6 +11,11 @@ browser.runtime.onMessage.addListener(async message => {
 		function normalize(url) {
 			if (!url) return null;
 			url = url.trim().replace(/[\\)\]}>,.!?]+$/g, "");
+
+			// add protocol so protocol-less URLs (e.g. "youtube.com/watch?v=...") are parsed correctly
+			if (/^(?:www\.)?youtube\.com\//.test(url) || /^youtu\.be\//.test(url))
+				url = "https://" + url;
+
 			try {
 				// supports relative urls from google search
 				const parsed = new URL(url, location.href);
@@ -28,7 +32,7 @@ browser.runtime.onMessage.addListener(async message => {
 						const v = parsed.searchParams.get("v");
 						const list = parsed.searchParams.get("list");
 						if (v) return v;
-						if ((v && list) || list) return stripRadioPrefix(list);
+						if (list) return stripRadioPrefix(list);
 					}
 					if (parsed.pathname === "/playlist") {
 						const list = parsed.searchParams.get("list");
@@ -93,7 +97,7 @@ browser.runtime.onMessage.addListener(async message => {
 			}
 		}
 
-		const pageText = document.body.innerText + "\n" + document.body.textContent;
+		const pageText = document.body.textContent;
 		const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?[^\s"'<>\\]+|playlist\?[^\s"'<>\\]+|shorts\/[^\s"'<>\\]+|embed\/[^\s"'<>\\]+)|youtu\.be\/[^\s"'<>\\]+)/gi;
 		const matches = [...pageText.matchAll(regex)];
 
@@ -101,4 +105,6 @@ browser.runtime.onMessage.addListener(async message => {
 
 		return { links: [...links] };
 	}
+
+	if (message.action === "writeClipboard") await navigator.clipboard.writeText(message.text);
 });
